@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+const firebase = require('./firebase.js');
+
 function error(status, msg) {
   var err = {
     status,
@@ -26,10 +28,19 @@ function error(status, msg) {
 });
 */
 
-app.get('/login', (req, res) => {
-  res.json({ status: "201" })
-});
+// Firebase gives you complete control over authentication by allowing you to authenticate users or devices using secure JSON Web Tokens (JWTs).
+// You generate these tokens on your server, pass them back to a client device, and then use them to authenticate via the signInWithCustomToken()
+// method.
 
+app.get('/login', (req, res) => {
+  let email = req.query['email'];
+  let password = req.query['password'];
+  firebase.Login(email, password).then((userRecord) => {
+    res.json(userRecord);
+  }).catch((error) => {
+    res.json(error);
+  });
+});
 
 // Okay, but then how do we serve a statically generated site, as
 // if we were a CDN?
