@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'login.dart';
 
 void main() => runApp(WelcomeScreen());
 
 class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -57,7 +59,9 @@ Widget buildLogInBtn() {
           ),
           textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
-        onPressed: () {},
+        onPressed: () {
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
+        },
         child: Text('Login')),
   );
 }
