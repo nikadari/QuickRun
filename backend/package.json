@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/firestore": "^4.15.1",
-    "firebase-admin": "^9.11.1"
+    "firebase-admin": "^9.11.1",
+    "underscore": "^1.13.1"
   }
 }
