@@ -143,6 +143,37 @@ app.get('/api/path', (req, res) => {
 
 });
 
+app.get("/api/debug", (req, res) => {
+  let lat = req.query['lat'];
+  let lng = req.query['lon'];
+
+  // get the proper_path via the algo in gmaps.js
+
+  let proper_path = [
+    {
+      lat: 44.226407,
+      lon: -76.513258
+    },
+    {
+      lat: 44.226891,
+      lon: -76.520635
+    },
+    {
+      lat: 44.240891,
+      lon: -76.510708
+    }
+  ];
+  let l = proper_path.length;
+  let waypoint_js = proper_path.map((waypoint) => {
+    return "markers.push(new google.maps.Marker({position: { lat:" + waypoint.lat + ",lng:" + waypoint.lon + "},map}));";
+  }).join("");
+  res.render('debug', {
+    lat,
+    lng,
+    waypoint_js
+  });
+});
+
 
 
 // Okay, but then how do we serve a statically generated site, as

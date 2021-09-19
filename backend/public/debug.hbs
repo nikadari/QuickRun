@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAhUl9axir3grRjxVW61ZTL3I0ZgSS23_E"></script>
+  </head>
+
+  <body style='padding:0px;margin:0px;'>
+    <div id="map" style="width:100%;height:100%"></div>
+  </body>
+
+  <script>
+    function initMap() {
+      const map = new google.maps.Map(
+        document.getElementById("map"),
+        {
+          zoom: 4,
+          center: {lat: {{lat}}, lng: {{lng}} },
+        }
+      );
+
+      let markers = [];
+
+      {{{waypoint_js}}}
+
+      for (let i =0 ; i < markers.length; i++) {
+        let marker = markers[i];
+        marker.setMap(map);
+      }
+    }
+    initMap();
+  </script>
+
+</html>
