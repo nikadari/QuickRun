@@ -39,5 +39,27 @@ module.exports = {
       });
 
     });
+  },
+  SignUp: async function(email, password, confirm_password) {
+    return new Promise((resolve, revoke) => {
+      if (password == confirm_password) {
+        admin.auth().createUser({
+          email,
+          password
+        }).then((userRecord) => {
+          userRecordObj = userRecord.toJSON();
+          let uid = userRecordObj.uid;
+          admin.auth().createCustomToken(uid).then((customToken) => {
+            resolve({customToken});
+          }).catch((error) => {
+            revoke({error});
+          });
+        }).catch((err) => {
+          revoke({err});
+        });
+      } else {
+        revoke({msg: "Password does not equal Confirm Password"});
+      }
+    })
   }
 };

@@ -61,6 +61,15 @@ app.get('/api/path', (req, res) => {
   res.render('index');
 });
 
+app.get("/api/signup", (req, res) => {
+  let email = req.query['email'];
+  let password = req.query['password'];
+  let confirm = req.query['confirm'];
+  firebase.SignUp(email, password, confirm).then((userRecord) => {
+    res.json(userRecord);
+  });
+});
+
 // Okay, but then how do we serve a statically generated site, as
 // if we were a CDN?
 // This is the frontend for D.E.X.T.E.R.
