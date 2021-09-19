@@ -10,6 +10,8 @@ function genGraph(center, size, travelMode){
     var originString = "";
     var destinationString = "";
 
+    var grid = new Array();
+
     //1 degree lat/lng is ~100000m 
 
     let interval = size / diameter;
@@ -19,38 +21,11 @@ function genGraph(center, size, travelMode){
     //move top left to bottom right, origin is always first
     for(let i = 0 - radius; i < radius; i++){ 
         for(let j = 0 - radius; j < radius; j++){
-            originString += (center.lat + (i * interval / 100000)) + "%2C" + (center.lng + (j * interval / 100000)) + "%7C";
-            destinationString += (center.lat + ((i + 1) * interval / 100000)) + "%2C" + (center.lng + ((j + 1)* interval / 100000)) + "%7C";
+            grid.push({lat:(center.lat + (i * interval / 100000)), lng:(center.lng + (j * interval / 100000))});
         }
     }
 
-    //Remove extra '|' 
-    originString = originString.substring(0, originString.length - 3);
-    destinationString = destinationString.substring(0, destinationString.length - 3);
-
-    //Log originString and destinationString
-    console.log(originString + "\n" + destinationString);
-
-    client
-        .distancematrix({
-        params: {
-            mode: travelMode,
-            origins: [{lat:0,lng:0}],
-            destinations: [{lat:1,lng:0}],
-            key: API_KEY,
-        },
-        timeout: 1000, // milliseconds
-    })
-    .then((r) => {
-        console.log(r.data.results[0].elevation);
-    })
-    .catch((e) => {
-        console.log(e);
-    });
+    console.log(grid);
 }
 
 genGraph({lat: 0, lng:0}, 1000,TravelMode.bicycling)
-
-function graphCallback(){
-
-}
