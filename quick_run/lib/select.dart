@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// For talking with the backend to submit database information.
+import 'package:http/http.dart' as http;
+
 //delete later
 void main() => runApp(SelectScreen());
+
+void UpdateActivity(String uid, int activityType, double pace, double distance, double time) async {
+  var uri = "http://localhost:3000/api/update/activity?uid=" + uid + "&type=" + activityType.toString() + "&pace=" + pace.toString() +
+  "&distance=" + distance.toString() + "&time=" + time.toString();
+  try {
+    var response = await http.get(Uri.parse(uri), headers: {
+      "Accept": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    });
+    print('Response body: ${response.body}');
+  } catch (e) {
+    // just consume the error. Who cares.
+    print(e);
+    print(uri);
+  }
+}
 
 class SelectScreen extends StatelessWidget {
   @override
@@ -39,8 +58,14 @@ Widget buildSoloBtn() {
 }
 
 class SelectScreenState extends State<SelectState> {
+
   late double inputD;
   late double inputT;
+  late double inputP;
+
+  var dController = new TextEditingController();
+  var tController = new TextEditingController();
+
   late int activity;
   late bool isD;
   Color icon1Color = Colors.white;
@@ -52,6 +77,7 @@ class SelectScreenState extends State<SelectState> {
     super.initState();
     inputD = 0.0;
     inputT = 0.0;
+    inputP = 0.0;
     activity = 1;
   }
 
@@ -76,6 +102,7 @@ class SelectScreenState extends State<SelectState> {
                       icon1Color = Colors.orangeAccent;
                       icon2Color = Colors.white;
                       icon3Color = Colors.white;
+                      UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity, inputP, inputD, inputT);
                     });
                   }),
               Text("Running",
@@ -103,6 +130,7 @@ class SelectScreenState extends State<SelectState> {
                       icon1Color = Colors.white;
                       icon2Color = Colors.orangeAccent;
                       icon3Color = Colors.white;
+                      UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity, inputP, inputD, inputT);
                     });
                   }),
               Text("Walking",
@@ -130,6 +158,7 @@ class SelectScreenState extends State<SelectState> {
                       icon1Color = Colors.white;
                       icon2Color = Colors.white;
                       icon3Color = Colors.orangeAccent;
+                      UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity, inputP, inputD, inputT);
                     });
                   }),
               Text("Cycling",
@@ -147,45 +176,87 @@ class SelectScreenState extends State<SelectState> {
   Widget buildDTFields() {
     return Container(
       padding: EdgeInsets.all(15.0),
-      child: Row(children: [
-        Expanded(
-          child: TextField(
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                fillColor: Colors.white,
-                filled: true,
-                hintText: "Distance (km)"),
-            onChanged: (str) {
-              try {
-                inputD = double.parse(str);
-              } catch (e) {
-                inputD = 0.0;
-              }
-            },
+      child: Column(children: [
+        TextField(
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+            fillColor: Colors.white,
+            filled: true,
+            hintText: "Pace (min/km)", // TODO: Needs to be stateful and dependent on option
           ),
+          onChanged: (str) {
+            try {
+              inputP = double.parse(str);
+              // update the time
+              inputT = inputD * inputP;
+              tController.text = inputT.toString();
+              UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity, inputP, inputD, inputT);
+            } catch (e) {
+              inputP = 0.0;
+            }
+          }
         ),
         SizedBox(
-          width: 20,
+          height: 20,
         ),
-        Expanded(
-          child: TextField(
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                fillColor: Colors.white,
-                filled: true,
-                hintText: "Time (min)"),
-            onChanged: (str) {
-              try {
-                inputT = double.parse(str);
-              } catch (e) {
-                inputT = 0.0;
-              }
-            },
+        Row(children: [
+          // distance input field
+          Expanded(
+            child: TextField(
+              keyboardType: TextInputType.number,
+              controller: dController,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: "Distance (km)",
+              ),
+              onChanged: (str) {
+                try {
+                  inputD = double.parse(str);
+                  // recompute the time.
+                  inputT = inputD * inputP;
+                  tController.text = inputT.toString();
+                  UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity, inputP, inputD, inputT);
+                } catch (e) {
+                  inputD = 0.0;
+                }
+              },
+            ),
           ),
-        )
-      ]),
+          SizedBox(
+            width: 20,
+          ),
+          // distance input field
+          Expanded(
+            child: TextField(
+              keyboardType: TextInputType.number,
+              controller: tController,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  filled: true,
+                  hintText: "Time (min)",
+
+              ),
+              onChanged: (str) {
+                try {
+                  inputT = double.parse(str);
+                  // recompute the distance
+                  if (inputP != 0) {
+                    inputD = inputT / inputP;
+                    dController.text = inputD.toString();
+                    UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity, inputP, inputD, inputT);
+                  }
+                } catch (e) {
+                  inputT = 0.0;
+                }
+              },
+            ),
+          )
+        ]),
+      ])
     );
   }
 

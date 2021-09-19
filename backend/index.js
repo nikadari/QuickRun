@@ -1,10 +1,14 @@
 const express = require('express')
 var hbs = require('hbs') // Templating engine.
 
+// Trying to fix a bug.
+var cors = require('cors')
+
 // Initialize the express js server.
 const app = express()
 app.set('view engine', 'hbs')
 app.set('views', './public')
+app.use(cors())
 
 const port = 3000
 
@@ -60,6 +64,24 @@ app.get("/signup", (req, res) => {
 // There exists one webview for every user.
 // use html templating to return a html page for viewing in the iframe?
 // this way we can get a custom html each time based on the user.
+
+app.get('/api/update/activity', (req, res) => {
+  let uid = req.query['uid'];
+  let activityType = req.query['type'];
+  let pace = req.query['pace'];
+  let distance = req.query['distance'];
+  let time = req.query['time'];
+  firebase.UpdateDesiredActivityForUser(uid, {
+    activityType: parseInt(activityType),
+    pace: parseFloat(pace),
+    distance: parseFloat(distance),
+    time: parseFloat(time)
+  }).then((result) => {
+    res.json({result});
+  }).catch((err) => {
+    res.json({err});
+  });
+})
 
 // for now we are going to use the uid, for the purposes of testing.
 // TODO: Use the custom generated token that users store for auth.
