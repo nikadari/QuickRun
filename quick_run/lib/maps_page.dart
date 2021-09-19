@@ -51,7 +51,7 @@ void main() {
     ui.platformViewRegistry.registerViewFactory(
       'hello-world-html',
       (int viewId) => IFrameElement()
-      ..src = 'http://localhost:3000/api/path?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString() 
+      ..src = 'http://localhost:3000/api/path?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString()
       ..style.border = 'none');
     runApp(MyApp());
 
@@ -92,26 +92,21 @@ class _AppGameState extends State<AppGame> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey,
-        leading: Container(
-          padding: EdgeInsets.all(5.0),
-          child: Image.asset(
-            "assets/2.png",
-            width: 64,
-            height: 64,
-          ),
-        )
+        backgroundColor: Colors.black38
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.grey,
+        color: Colors.black38,
         child: Container(
-          padding: EdgeInsets.all(5.0),
-          child: Image.asset(
-            "assets/2.png",
-            width: 64,
-            height: 64,
-          ),
-        ),
+          padding: EdgeInsets.symmetric(vertical: 25),
+          child: IconButton(
+            icon: Icon(
+              Icons.play_circle_fill_rounded,
+            ),
+            iconSize: 64,
+            onPressed: () {
+              print("Go.");
+          }),
+        )
       ),
       body: HtmlElementView(viewType: 'hello-world-html')
     );
