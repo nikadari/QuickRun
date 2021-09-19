@@ -25,7 +25,7 @@ function genGraph(center, size, travelMode){
         }
     }
 
-    console.log(grid);
+    return grid;
 }
 
 genGraph({lat: 0, lng:0}, 1000,TravelMode.bicycling)
