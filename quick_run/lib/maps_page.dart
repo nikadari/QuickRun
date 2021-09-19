@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:html';
 import 'dart:ui' as ui;
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 Future<Position> _determinePosition() async {
   bool serviceEnabled;
@@ -40,34 +41,10 @@ Future<Position> _determinePosition() async {
   return await Geolocator.getCurrentPosition();
 }
 
-void main() {
-
-  // Determine the location of the user.
-  Future<Position> futurePos = _determinePosition();
-  futurePos.then( (pos) {
-    var lat = pos.latitude;
-    var lon = pos.longitude;
-
-    ui.platformViewRegistry.registerViewFactory(
-      'hello-world-html',
-      (int viewId) => IFrameElement()
-      ..src = 'http://localhost:3000/api/path?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString()
-      ..style.border = 'none');
-    runApp(MyApp());
-
-  }).catchError((err) => print(err));
-
-}
-
-// For doing state in the app, it works like so.
-
-// We have a StatefulWidget
-// We have a State class
-//
-
-class MyApp extends StatelessWidget {
+class MapsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
     // This gets run everytime the app requires rendering.
     return MaterialApp(
       title: 'QuickRun',
@@ -88,8 +65,11 @@ class AppGame extends StatefulWidget {
 // RandomWords class.
 class _AppGameState extends State<AppGame> {
 
+  Future<Position> futurePos = _determinePosition();
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black38
@@ -108,7 +88,31 @@ class _AppGameState extends State<AppGame> {
           }),
         )
       ),
-      body: HtmlElementView(viewType: 'hello-world-html')
+      body: Visibility(
+        child: FutureBuilder<Position>(
+          future: futurePos,
+          builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+            var pos = snapshot.data;
+            if (pos != null) {
+                //print(pos);
+                var lat = pos.latitude;
+                var lon = pos.longitude;
+                ui.platformViewRegistry.registerViewFactory(
+                  'hello-world-html',
+                  (int viewId) => IFrameElement()
+                  ..src = 'http://localhost:3000/api/path?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString()
+                  ..style.border = 'none'
+                );
+                return HtmlElementView(viewType: 'hello-world-html');
+            } else {
+              return SpinKitRotatingCircle(
+                color: Colors.grey,
+                size: 50.0,
+              );
+            }
+          }
+        ),
+      ),
     );
   }
 }

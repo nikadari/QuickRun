@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'maps_page.dart'; // For navigation
+
 // For talking with the backend to submit database information.
 import 'package:http/http.dart' as http;
 
@@ -37,25 +39,7 @@ class SelectState extends StatefulWidget {
   SelectScreenState createState() => SelectScreenState();
 }
 
-Widget buildSoloBtn() {
-  return Container(
-    padding: EdgeInsets.symmetric(vertical: 25),
-    width: 300,
-    child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(10.0),
-          primary: Color(0xFFfb8c00),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        onPressed: () {
-          //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
-        },
-        child: Text('Solo')),
-  );
-}
+
 
 class SelectScreenState extends State<SelectState> {
 
@@ -295,9 +279,37 @@ class SelectScreenState extends State<SelectState> {
                 const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
           onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MapsPage()),
+            );
             //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
           },
           child: Text('Community')),
+    );
+  }
+
+  Widget buildSoloBtn() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 25),
+      width: 300,
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.all(10.0),
+            primary: Color(0xFFfb8c00),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MapsPage()),
+            );
+            //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
+          },
+          child: Text('Solo')),
     );
   }
 

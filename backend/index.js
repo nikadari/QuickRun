@@ -8,7 +8,6 @@ var cors = require('cors')
 const app = express()
 app.set('view engine', 'hbs')
 app.set('views', './public')
-app.use(cors())
 
 const port = 3000
 
