@@ -1,147 +1,119 @@
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'dart:html';
+import 'dart:ui' as ui;
+import 'package:geolocator/geolocator.dart';
 
-// // import 'package:english_words/english_words.dart'; // How to import a library.
-// // import 'package:http/http.dart' as http;
-// // import 'package:google_maps_flutter/google_maps_flutter.dart';
-// // import 'package:webview_flutter/webview_flutter.dart';
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
 
-// import 'dart:html';
-// import 'dart:ui' as ui;
+  // Test if location services are enabled.
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    // Location services are not enabled don't continue
+    // accessing the position and request users of the
+    // App to enable the location services.
+    return Future.error('Location services are disabled.');
+  }
 
-// // void main() {
-// //   ui.platformViewRegistry.registerViewFactory(
-// //     'hello-world-html',
-// //     (int viewId) => IFrameElement()
-// //     ..src = 'http://localhost:3000/api/path'
-// //     ..style.border = 'none');
-// //   runApp(MyApp());
-// // } UNCOMMENT LATER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Permissions are denied, next time you could try
+      // requesting permissions again (this is also where
+      // Android's shouldShowRequestPermissionRationale
+      // returned true. According to Android guidelines
+      // your App should show an explanatory UI now.
+      return Future.error('Location permissions are denied');
+    }
+  }
 
-// // For doing state in the app, it works like so.
+  if (permission == LocationPermission.deniedForever) {
+    // Permissions are denied forever, handle appropriately.
+    return Future.error(
+      'Location permissions are permanently denied, we cannot request permissions.');
+  }
 
-// // We have a StatefulWidget
-// // We have a State class
-// //
+  // When we reach here, permissions are granted and we can
+  // continue accessing the position of the device.
+  return await Geolocator.getCurrentPosition();
+}
 
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     // This gets run everytime the app requires rendering.
-//     return MaterialApp(
-//       title: 'QuickRun',
-//       home: AppGame(),
-//     );
-//   }
-// }
+void main() {
 
-// class AppGame extends StatefulWidget {
-//   // Note that the arrow syntax is quite like the same that is used in
-//   // Javascript. Cool.
-//   @override
-//   _AppGameState createState() => _AppGameState();
-// }
+  // Determine the location of the user.
+  Future<Position> futurePos = _determinePosition();
+  futurePos.then( (pos) {
+    var lat = pos.latitude;
+    var lon = pos.longitude;
 
-// // Prefixing with the underscore enforces privacy in the Dart language.
-// // the templating syntax is in fact to make a generic state specific for the
-// // RandomWords class.
-// class _AppGameState extends State<AppGame> {
-//   // Determining the screen width and height.
-//   // var height = MediaQuery.of(context).size.height;
-//   // var width = MediaQuery.of(context).size.width;
+    ui.platformViewRegistry.registerViewFactory(
+      'hello-world-html',
+      (int viewId) => IFrameElement()
+      ..src = 'http://localhost:3000/api/path?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString() 
+      ..style.border = 'none');
+    runApp(MyApp());
 
-//   // Directions API to get back a path, and we can include intermediate
-//   // waypoints. So this is what we are going to do on the backend.
+  }).catchError((err) => print(err));
 
-//   // Common to use late in combination with Final.
-//   // Initializes the variable when it is first read rather than created.
-//   // late GoogleMapController mapController; UNCOMMENT LATER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//   // Just some random location it seems.
-//   // final LatLng _center = const LatLng(44.228690, -76.487910); UNCOMMENT LATER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//   //var LatLng secondary_location = const LatLng(44.224582, -76.492615);
+}
 
-//   // void _onMapCreated(GoogleMapController controller) {
-//   //   mapController = controller;
-//   // } UNCOMMENT LATER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// For doing state in the app, it works like so.
 
-//   @override
-//   Widget build(BuildContext context) {
-//     // Here is the MEAT JUICE of the code, btw.
-//     // We need to know the pace that they plan to run at.
-//     // Assumming right now JUST using for running.
-//     // Need to know either the distance or the time.
-//     // We also need the starting location of the person,
-//     // in latitude and longitude.
+// We have a StatefulWidget
+// We have a State class
+//
 
-//     /*
-//     Future<http.Response> fetchPath(double pace, double lat, double lon, {double distance, double time}) {
-//       var uri = "https://localhost:3000/api/path?pace=" + toString(pace) + "&lat=" + toString(lat) +
-//       "&lon=" + toString(lon);
-//       if (distance != null) uri = uri + "&distance=" + toString(distance);
-//       if (time != null) uri = uri + "&time=" + toString(time);
-//       return http.get(Uri.parse(uri));
-//     }*/
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // This gets run everytime the app requires rendering.
+    return MaterialApp(
+      title: 'QuickRun',
+      home: AppGame(),
+    );
+  }
+}
 
-//     return Scaffold(
-//         appBar: AppBar(
-//             backgroundColor: Colors.grey,
-//             leading: Container(
-//               padding: EdgeInsets.all(5.0),
-//               child: Image.asset(
-//                 "assets/2.png",
-//                 width: 64,
-//                 height: 64,
-//               ),
-//             )),
-//         bottomNavigationBar: BottomAppBar(
-//           color: Colors.grey,
-//           child: Container(
-//             padding: EdgeInsets.all(5.0),
-//             child: Image.asset(
-//               "assets/2.png",
-//               width: 64,
-//               height: 64,
-//             ),
-//           ),
-//         ),
+class AppGame extends StatefulWidget {
+  // Note that the arrow syntax is quite like the same that is used in
+  // Javascript. Cool.
+  @override
+  _AppGameState createState() => _AppGameState();
+}
 
-//         /*
-//       body: GoogleMap(
-//         onMapCreated: _onMapCreated,
-//         initialCameraPosition: CameraPosition(
-//           target: _center,
-//           zoom: 11.0
-//         )
-//       ),
-//       */
-//         body: HtmlElementView(viewType: 'hello-world-html'));
-//   }
+// Prefixing with the underscore enforces privacy in the Dart language.
+// the templating syntax is in fact to make a generic state specific for the
+// RandomWords class.
+class _AppGameState extends State<AppGame> {
 
-//   /*
-//   Widget _buildSuggestions() {
-//     return ListView.builder(
-//       padding: const EdgeInsets.all(16.0),
-//       // this is an anonymous function.
-//       itemBuilder: (context, i) {
-//         if (i.isOdd) return const Divider();
-//         // Final variable can only be set once. Whereas the const variable
-//         // is set at compile time.
-//         final index = i ~/ 2; // truncating division operator.
-//         if (index >= _suggestions.length) {
-//           _suggestions.addAll(generateWordPairs().take(10));
-//         }
-//         return _buildRow(_suggestions[index]);
-//       }
-//     );
-//   }
-
-//   Widget _buildRow(WordPair pair) {
-//     return ListTile(
-//       title: Text(
-//         pair.asPascalCase,
-//         style: _biggerFont
-//       )
-//     );
-//   }
-//   */
-
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.grey,
+        leading: Container(
+          padding: EdgeInsets.all(5.0),
+          child: Image.asset(
+            "assets/2.png",
+            width: 64,
+            height: 64,
+          ),
+        )
+      ),
+      bottomNavigationBar: BottomAppBar(
+        color: Colors.grey,
+        child: Container(
+          padding: EdgeInsets.all(5.0),
+          child: Image.asset(
+            "assets/2.png",
+            width: 64,
+            height: 64,
+          ),
+        ),
+      ),
+      body: HtmlElementView(viewType: 'hello-world-html')
+    );
+  }
+}
