@@ -15,21 +15,19 @@ const auth = getAuth();
 console.log(app);
 */
 
-/*const {Firestore} = require('@google-cloud/firestore');
+const {Firestore} = require('@google-cloud/firestore');
 
 const firestore = new Firestore({
   projectId: "quickrun-d93aa",
   keyFilename: "./firebase_credentials.json"
 });
 
-let collectionRef = firestore.collection('test');
-console.log('collection ref',collectionRef);
-
-collectionRef.add({foo: 'bar'}).then(docRef => {
+/*collectionRef.add({foo: 'bar'}).then(docRef => {
   let firestore_loc = docRef.firestore;
   console.log(`Root location for document is ${firestore_loc.formattedName}`);
 });
 */
+
 
 // TODO: Read in the credentials at runtime? Maybe.
 var admin = require("firebase-admin");
@@ -82,5 +80,25 @@ module.exports = {
         revoke({msg: "Password does not equal Confirm Password"});
       }
     })
+  },
+  GetDesiredActivityForUser: async function(uid) {
+    try {
+      console.log("we here");
+      console.log(firestore);
+      console.log(firestore.doc);
+      let docRef = firestore.doc(uid + "/desiredActivity");
+      console.log(docRef);
+      let docSnap = await docRef.get();
+      console.log(docSnap);
+      console.log(docSnap.data());
+      if (docSnap != undefined) {
+        console.log("and we done");
+        return docSnap.data();
+      } else {
+        throw "No document!";
+      }
+    } catch (err) {
+      throw err;
+    }
   }
 };
