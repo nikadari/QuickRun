@@ -1,29 +1,65 @@
 import 'package:flutter/material.dart';
-import 'welcome_body.dart';
 
 void main() => runApp(WelcomeScreen());
 
 class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Body(),
+    return MaterialApp(
+      home: MyWelcomePage(),
     );
   }
-  // build(BuildContext context) {
-  //   return MaterialApp(
-  //     title: 'QuickRun',
-  //     theme: ThemeData(
-  //       scaffoldBackgroundColor: const Color(0xFF545454),
-  //     ),
-  //     home: MyWelcomePage(),
-  //   );
-  // }
 }
 
 class MyWelcomePage extends StatefulWidget {
   @override
   WelcomeState createState() => WelcomeState();
+}
+
+Widget buildSignUpBtn() {
+  return GestureDetector(
+    onTap: () => print("Sign up pressed"),
+    child: RichText(
+      text: TextSpan(
+        children: [
+          TextSpan(
+            text: "Don't have an Account? ",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          TextSpan(
+            text: "Sign Up",
+            style: TextStyle(
+              color: Colors.orange,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget buildLogInBtn() {
+  return Container(
+    padding: EdgeInsets.symmetric(vertical: 25),
+    width: 300,
+    child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(10.0),
+          primary: Color(0xFFfb8c00),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        ),
+        onPressed: () {},
+        child: Text('Login')),
+  );
 }
 
 class WelcomeState extends State<MyWelcomePage> {
@@ -49,18 +85,77 @@ class WelcomeState extends State<MyWelcomePage> {
       ),
     );
 
-    return Scaffold(
-      //appBar: appBar,
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              logo,
-            ],
+    ElevatedButton login_btn = ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.all(10.0),
+          primary: Color(0xFFfb8c00),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
+          textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+        ),
+        onPressed: () {},
+        child: Text('Login'));
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Stack(
+          children: <Widget>[
+            Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height,
+                maxWidth: MediaQuery.of(context).size.width,
+              ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color(0xFF616161),
+                    Color(0xFF424242),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.centerRight,
+                ),
+              ),
+              child: Column(
+                children: <Widget>[
+                  logo,
+                  buildLogInBtn(),
+                  buildSignUpBtn(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
+
+    // return Scaffold(
+    //   //appBar: appBar,
+    //   body: SingleChildScrollView(
+    //     child: Container(
+    //       constraints: BoxConstraints(
+    //         maxHeight: MediaQuery.of(context).size.height,
+    //         maxWidth: MediaQuery.of(context).size.width,
+    //       ),
+    //       decoration: BoxDecoration(
+    //         gradient: LinearGradient(
+    //           colors: [
+    //             Color(0xFF616161),
+    //             Color(0xFF424242),
+    //           ],
+    //           begin: Alignment.topLeft,
+    //           end: Alignment.centerRight,
+    //         ),
+    //       ),
+    //       child: Column(
+    //         children: <Widget>[
+    //           logo,
+    //           login,
+    //           buildSignUpBtn(),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }
