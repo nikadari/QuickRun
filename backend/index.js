@@ -10,6 +10,7 @@ const algorithm = require("./algorithm.js");
 const app = express()
 app.set('view engine', 'hbs')
 app.set('views', './public')
+app.use(cors);
 
 const port = 3000
 
@@ -88,7 +89,7 @@ app.get('/api/update/activity', (req, res) => {
 // TODO: Use the custom generated token that users store for auth.
 app.get('/api/path', (req, res) => {
 
-  console.log('API');
+  //console.log('API');
 
   // For the data that will be stored in Firebase.
   // The formatting will be like so.
@@ -110,30 +111,33 @@ app.get('/api/path', (req, res) => {
     // TODO: From the desired activity it is necessary to build the
     // correct path.
 
-    let proper_path = algorithm.getpath({lat, lng}, desiredActivity.distance/2);
+    console.log({lat, lng});
+    console.log(desiredActivity.distance);
+    let proper_path = algorithm.getPath({lat, lng}, desiredActivity.distance);
+    console.log('proper_path',proper_path);
     /*let proper_path = [
       {
         lat: 44.229571,
-        lon: -76.501460
+        lng: -76.501460
       },
       {
         lat: 44.222516,
-        lon: -76.500951
+        lng: -76.500951
       },
       {
         lat: 44.227531,
-        lon: -76.484051
+        lng: -76.484051
       },
       {
         lat: 44.228585,
-        lon: -76.487828
+        lng: -76.487828
       }
     ];*/
 
     let l = proper_path.length;
     let last_waypoint = proper_path[l - 1];
     let waypoint_js = proper_path.slice(0, l - 1).map((waypoint) => {
-      return "{location: new google.maps.LatLng(" + waypoint.lat + "," + waypoint.lon + "), stopover: true }";
+      return "{location: new google.maps.LatLng(" + waypoint.lat + "," + waypoint.lng + "), stopover: true }";
     }).join(",");
 
     res.render('index', {
