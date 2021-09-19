@@ -12,7 +12,7 @@
       var directionsService = new google.maps.DirectionsService();
       //var directionsRenderer = new google.maps.DirectionsRenderer({suppressMarkers: true});
       var directionsRenderer = new google.maps.DirectionsRenderer();
-      var center = new google.maps.LatLng({{lat}}, {{lon}});
+      var center = new google.maps.LatLng({{lat}}, {{lng}});
       var mapOptions = {
         zoom: 7,
         center,
@@ -29,10 +29,25 @@
         waypoints: [
           {{{waypoint_js}}}
         ],
-        travelMode: 'DRIVING'
+        travelMode: 'WALKING'
       };
       directionsService.route(request, function(result, status) {
         if (status == 'OK') {
+
+          // determine distance of route.
+          let directionsResult = result;
+          let desired_distance = {{desired_distance}};
+          let total_distance = 0; // in m.
+          // generally only one route.
+          directionsResult.routes[0].legs.forEach((leg) => {
+            total_distance += leg.distance.value;
+          });
+
+          let error = Math.abs(total_distance - desired_distance) / desired_distance * 100;
+          console.log('total_distance', total_distance);
+          console.log('desired_distance', desired_distance);
+          console.log('path err', error,"%");
+
           directionsRenderer.setDirections(result);
         }
       });

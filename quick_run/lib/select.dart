@@ -215,6 +215,7 @@ class SelectScreenState extends State<SelectState> {
                   UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity,
                       inputP, inputD, inputT);
                 } catch (e) {
+                  print(e);
                   inputP = 0.0;
                 }
               }),
@@ -311,10 +312,10 @@ class SelectScreenState extends State<SelectState> {
                 const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           ),
           onPressed: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => MapsPage()),
-            // );
+             Navigator.push(
+               context,
+               MaterialPageRoute(builder: (context) => MapsPage()),
+             );
             //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
           },
           child: Text('Community')),
@@ -336,10 +337,10 @@ class SelectScreenState extends State<SelectState> {
                 const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           ),
           onPressed: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => MapsPage()),
-            // );
+             Navigator.push(
+               context,
+               MaterialPageRoute(builder: (context) => MapsPage()),
+             );
             //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
           },
           child: Text('Solo')),

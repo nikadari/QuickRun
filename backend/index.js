@@ -1,8 +1,7 @@
 const express = require('express')
 var hbs = require('hbs') // Templating engine.
 
-// Trying to fix a bug.
-var cors = require('cors');
+
 const gmaps = require("./gmaps.js");
 const algorithm = require("./algorithm.js");
 
@@ -10,7 +9,8 @@ const algorithm = require("./algorithm.js");
 const app = express()
 app.set('view engine', 'hbs')
 app.set('views', './public')
-app.use(cors);
+const cors = require("cors");
+app.use(cors());
 
 const port = 3000
 
@@ -101,8 +101,8 @@ app.get('/api/path', (req, res) => {
   // time will be in minutes, always, regardless of activity.
   // since we either use distance or time in our calculations,
   // we need to know which one is the canoncial one.
-  let lat = req.query['lat'];
-  let lng = req.query['lon'];
+  let lat = parseFloat(req.query['lat']);
+  let lng = parseFloat(req.query['lon']);
   let uid = req.query['uid'];
 
   firebase.GetDesiredActivityForUser(uid).then((desiredActivity) => {
@@ -111,10 +111,15 @@ app.get('/api/path', (req, res) => {
     // TODO: From the desired activity it is necessary to build the
     // correct path.
 
-    console.log({lat, lng});
-    console.log(desiredActivity.distance);
+    console.log('origin',{lat, lng});
+    console.log('distance (km)', desiredActivity.distance);
+
+    // for testing purposes
+    lat = 40.677848;
+    lng = -73.947861;
+
     let proper_path = algorithm.getPath({lat, lng}, desiredActivity.distance);
-    console.log('proper_path',proper_path);
+
     /*let proper_path = [
       {
         lat: 44.229571,
@@ -133,6 +138,7 @@ app.get('/api/path', (req, res) => {
         lng: -76.487828
       }
     ];*/
+    console.log('proper_path',proper_path);
 
     let l = proper_path.length;
     let last_waypoint = proper_path[l - 1];
@@ -140,12 +146,15 @@ app.get('/api/path', (req, res) => {
       return "{location: new google.maps.LatLng(" + waypoint.lat + "," + waypoint.lng + "), stopover: true }";
     }).join(",");
 
+    console.log(waypoint_js);
+
     res.render('index', {
       lat,
-      lon,
+      lng,
       dest_lat: last_waypoint.lat,
-      dest_lon: last_waypoint.lon,
-      waypoint_js
+      dest_lon: last_waypoint.lng,
+      waypoint_js,
+      desired_distance: desiredActivity.distance * 1000 // convert to meters from km.
     });
 
   }).catch((error) => {

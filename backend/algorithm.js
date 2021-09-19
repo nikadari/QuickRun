@@ -1,15 +1,22 @@
 //Make set of 10 waypoints to draw paths
-const smoothing = 0.3;
+const smoothing = 0.5;
 const deadzone = 0.15;
 const pull = 1;
 
-function getPath(origin, desiredTravelDistance) {
-  let numberOfNodesForPath = 5;
-  let wypnts = waypoints(numberOfNodesForPath);
-  let diameter = desiredTravelDistance * 1000 / 2; // travel distance is in km
-  let interval = diameter / 10 / 100000;
-  let geo_wypnts = convertGeo(waypoints(numberOfNodesForPath), origin, interval);
-  return geo_wypnts;
+module.exports = {
+  getPath: function(origin, desiredTravelDistance) {
+    try {
+      let numberOfNodesForPath = 5;
+      let wypnts = waypoints(numberOfNodesForPath);
+      console.log(wypnts);
+      let diameter = desiredTravelDistance * 1000 / 2; // travel distance is in km
+      let interval = diameter / 10 / 100000;
+      let geo_wypnts = convertGeo(waypoints(numberOfNodesForPath), origin, interval);
+      return geo_wypnts;
+    } catch(err) {
+      console.error(err);
+    }
+  }
 }
 
 // distance is the number of nodes.
@@ -23,13 +30,12 @@ function waypoints(distance) {
 
     //var position = [{lat:origin.lat, lng:origin.lng}];
     var position = {x:0, y:0};
-    var waypoints = new Array();
-
+    var waypoints = [];
     var distanceleft = distance;
-
     var returnIntent = false;
 
     do{
+        console.log('waypoints', waypoints);
         waypoints.push(Object.assign({}, position));
 
         let cx = 0;
@@ -85,6 +91,7 @@ function waypoints(distance) {
         
         console.log("d:",xChanged,yChanged,distanceleft);
     } while(position.x != 0 || position.y != 0);
+
 
     waypoints.push(position);
     return waypoints;
