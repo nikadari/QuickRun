@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
+
 import 'package:english_words/english_words.dart'; // How to import a library.
 import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
-void main() => runApp(MyApp());
+import 'dart:html';
+import 'dart:ui' as ui;
+
+void main() {
+  ui.platformViewRegistry.registerViewFactory(
+    'hello-world-html',
+    (int viewId) => IFrameElement()
+    ..width = '640'
+    ..height = '360'
+    ..src = 'https://localhost:3000'
+    ..style.border = 'none');
+  runApp(MyApp());
+}
 
 // For doing state in the app, it works like so.
 
@@ -33,11 +47,20 @@ class AppGame extends StatefulWidget {
 // the templating syntax is in fact to make a generic state specific for the
 // RandomWords class.
 class _AppGameState extends State<AppGame> {
+
+  // Determining the screen width and height.
+  // var height = MediaQuery.of(context).size.height;
+  // var width = MediaQuery.of(context).size.width;
+
+  // Directions API to get back a path, and we can include intermediate
+  // waypoints. So this is what we are going to do on the backend.
+
   // Common to use late in combination with Final.
   // Initializes the variable when it is first read rather than created.
   late GoogleMapController mapController;
   // Just some random location it seems.
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  final LatLng _center = const LatLng(44.228690, -76.487910);
+  //var LatLng secondary_location = const LatLng(44.224582, -76.492615);
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -85,6 +108,8 @@ class _AppGameState extends State<AppGame> {
           ),
         ),
       ),
+
+      /*
       body: GoogleMap(
         onMapCreated: _onMapCreated,
         initialCameraPosition: CameraPosition(
@@ -92,6 +117,12 @@ class _AppGameState extends State<AppGame> {
           zoom: 11.0
         )
       ),
+      */
+      body: SizedBox(
+        width: 640,
+        height: 360,
+        child: HtmlElementView(viewType: 'hello-world-html'),
+      )
     );
   }
 
