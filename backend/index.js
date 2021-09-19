@@ -48,6 +48,15 @@ app.get('/login', (req, res) => {
   });
 });
 
+app.get("/signup", (req, res) => {
+  let email = req.query['email'];
+  let password = req.query['password'];
+  let confirm = req.query['confirm'];
+  firebase.SignUp(email, password, confirm).then((userRecord) => {
+    res.json(userRecord);
+  });
+});
+
 // There exists one webview for every user.
 // use html templating to return a html page for viewing in the iframe?
 // this way we can get a custom html each time based on the user.
@@ -55,11 +64,65 @@ app.get('/login', (req, res) => {
 // for now we are going to use the uid, for the purposes of testing.
 // TODO: Use the custom generated token that users store for auth.
 app.get('/api/path', (req, res) => {
+
+  console.log('API');
+
+  // For the data that will be stored in Firebase.
+  // The formatting will be like so.
+  // pace is a number in min/km, if the activity is selected as Run.
+  // pace is in km/h if the activity is a cycle.
+  // pace for walking will be canonical. Use the average human walking pace.
+  // we will use min/km for this.
+  // distance will be in km, always, regardless of activity.
+  // time will be in minutes, always, regardless of activity.
+  // since we either use distance or time in our calculations,
+  // we need to know which one is the canoncial one.
   let lat = req.query['lat'];
   let lon = req.query['lon'];
   let uid = req.query['uid'];
-  res.render('index');
+
+  firebase.GetDesiredActivityForUser(uid).then((desiredActivity) => {
+
+    console.log('desiredActivity', desiredActivity);
+    // TODO: From the desired activity it is necessary to build the
+    // correct path.
+
+    let proper_path = [
+      {
+        lat: 44.226407,
+        lon: -76.513258
+      },
+      {
+        lat: 44.226891,
+        lon: -76.520635
+      },
+      {
+        lat: 44.240891,
+        lon: -76.510708
+      }
+    ];
+
+    let l = proper_path.length;
+    let last_waypoint = proper_path[l - 1];
+    let waypoint_js = proper_path.slice(0, l - 1).map((waypoint) => {
+      return "{location: new google.maps.LatLng(" + waypoint.lat + "," + waypoint.lon + "), stopover: true }";
+    }).join(",");
+
+    res.render('index', {
+      lat,
+      lon,
+      dest_lat: last_waypoint.lat,
+      dest_lon: last_waypoint.lon,
+      waypoint_js
+    });
+
+  }).catch((error) => {
+    res.send(JSON.stringify(error));
+  });
+
 });
+
+
 
 // Okay, but then how do we serve a statically generated site, as
 // if we were a CDN?
