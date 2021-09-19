@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'maps_page.dart'; // For navigation
+
+// For talking with the backend to submit database information.
+import 'package:http/http.dart' as http;
+
 //delete later
 void main() => runApp(SelectScreen());
+
+void UpdateActivity(String uid, int activityType, double pace, double distance,
+    double time) async {
+  var uri = "http://localhost:3000/api/update/activity?uid=" +
+      uid +
+      "&type=" +
+      activityType.toString() +
+      "&pace=" +
+      pace.toString() +
+      "&distance=" +
+      distance.toString() +
+      "&time=" +
+      time.toString();
+  try {
+    var response = await http.get(Uri.parse(uri), headers: {
+      "Accept": "application/json",
+      "Access-Control-Allow-Origin": "*"
+    });
+    print('Response body: ${response.body}');
+  } catch (e) {
+    // just consume the error. Who cares.
+    print(e);
+    print(uri);
+  }
+}
 
 class SelectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: SelectState(),
     );
   }
@@ -18,32 +49,18 @@ class SelectState extends StatefulWidget {
   SelectScreenState createState() => SelectScreenState();
 }
 
-Widget buildSoloBtn() {
-  return Container(
-    padding: EdgeInsets.symmetric(vertical: 25),
-    width: 300,
-    child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(10.0),
-          primary: Color(0xFFfb8c00),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        onPressed: () {
-          //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
-        },
-        child: Text('Solo')),
-  );
-}
-
 class SelectScreenState extends State<SelectState> {
   late double inputD;
   late double inputT;
+  late double inputP;
+
+  var dController = new TextEditingController();
+  var tController = new TextEditingController();
+  var pController = new TextEditingController();
+
   late int activity;
   late bool isD;
-  Color icon1Color = Colors.white;
+  Color icon1Color = Colors.orangeAccent;
   Color icon2Color = Colors.white;
   Color icon3Color = Colors.white;
 
@@ -52,10 +69,22 @@ class SelectScreenState extends State<SelectState> {
     super.initState();
     inputD = 0.0;
     inputT = 0.0;
+    inputP = 5.0;
     activity = 1;
+    dController.text = "0";
+    tController.text = "0";
+    pController.text = "5";
   }
 
   Widget buildActivityOptions() {
+    void UpdatePace(double newPace) {
+      inputP = newPace;
+      pController.text = inputP.toString();
+      // Update the time
+      inputT = inputD * inputP;
+      tController.text = inputT.toString();
+    }
+
     return Container(
       padding: EdgeInsets.all(15.0),
       child: Wrap(
@@ -72,10 +101,13 @@ class SelectScreenState extends State<SelectState> {
                   onPressed: () {
                     setState(() {
                       activity = 1;
+                      UpdatePace(5.0);
                       print(activity);
                       icon1Color = Colors.orangeAccent;
                       icon2Color = Colors.white;
                       icon3Color = Colors.white;
+                      UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity,
+                          inputP, inputD, inputT);
                     });
                   }),
               Text("Running",
@@ -99,10 +131,13 @@ class SelectScreenState extends State<SelectState> {
                   onPressed: () {
                     setState(() {
                       activity = 2;
+                      UpdatePace(13);
                       print(activity);
                       icon1Color = Colors.white;
                       icon2Color = Colors.orangeAccent;
                       icon3Color = Colors.white;
+                      UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity,
+                          inputP, inputD, inputT);
                     });
                   }),
               Text("Walking",
@@ -126,10 +161,13 @@ class SelectScreenState extends State<SelectState> {
                   onPressed: () {
                     setState(() {
                       activity = 3;
+                      UpdatePace(2);
                       print(activity);
                       icon1Color = Colors.white;
                       icon2Color = Colors.white;
                       icon3Color = Colors.orangeAccent;
+                      UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity,
+                          inputP, inputD, inputT);
                     });
                   }),
               Text("Cycling",
@@ -144,49 +182,118 @@ class SelectScreenState extends State<SelectState> {
     );
   }
 
+  Text pace = Text("Pace    ",
+      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold));
+
   Widget buildDTFields() {
     return Container(
-      padding: EdgeInsets.all(15.0),
-      child: Row(children: [
-        Expanded(
-          child: TextField(
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
+        padding: EdgeInsets.all(15.0),
+        child: Column(children: [
+          TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 fillColor: Colors.white,
                 filled: true,
-                hintText: "Distance (km)"),
-            onChanged: (str) {
-              try {
-                inputD = double.parse(str);
-              } catch (e) {
-                inputD = 0.0;
-              }
-            },
+                //prefix: pace,
+                suffix: Text('min/km'),
+                helperText:
+                    'Pace', // TODO: Needs to be stateful and dependent on option
+                helperStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+              controller: pController,
+              onChanged: (str) {
+                try {
+                  inputP = double.parse(str);
+                  // TODO: The code below can be factored out.
+                  // Update the time
+                  inputT = inputD * inputP;
+                  tController.text = inputT.toString();
+                  UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity,
+                      inputP, inputD, inputT);
+                } catch (e) {
+                  inputP = 0.0;
+                }
+              }),
+          SizedBox(
+            height: 20,
           ),
-        ),
-        SizedBox(
-          width: 20,
-        ),
-        Expanded(
-          child: TextField(
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                fillColor: Colors.white,
-                filled: true,
-                hintText: "Time (min)"),
-            onChanged: (str) {
-              try {
-                inputT = double.parse(str);
-              } catch (e) {
-                inputT = 0.0;
-              }
-            },
+          Row(children: [
+            // distance input field
+            Expanded(
+              child: TextField(
+                keyboardType: TextInputType.number,
+                controller: dController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  filled: true,
+                  suffix: Text('km'),
+                  helperText:
+                      'Distance', // TODO: Needs to be stateful and dependent on option
+                  helperStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
+                ),
+                onChanged: (str) {
+                  try {
+                    inputD = double.parse(str);
+                    // recompute the time.
+                    inputT = inputD * inputP;
+                    tController.text = inputT.toString();
+                    UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity,
+                        inputP, inputD, inputT);
+                  } catch (e) {
+                    inputD = 0.0;
+                  }
+                },
+              ),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            // distance input field
+            Expanded(
+              child: TextField(
+                keyboardType: TextInputType.number,
+                controller: tController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  filled: true,
+                  suffix: Text('min'),
+                  helperText:
+                      'Time', // TODO: Needs to be stateful and dependent on option
+                  helperStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                  ),
+                ),
+                onChanged: (str) {
+                  try {
+                    inputT = double.parse(str);
+                    // recompute the distance
+                    if (inputP != 0) {
+                      inputD = inputT / inputP;
+                      dController.text = inputD.toString();
+                      UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity,
+                          inputP, inputD, inputT);
+                    }
+                  } catch (e) {
+                    inputT = 0.0;
+                  }
+                },
+              ),
+            )
+          ]),
+          SizedBox(
+            height: 20,
           ),
-        )
-      ]),
-    );
+        ]));
   }
 
   Widget buildCommunityBtn() {
@@ -195,18 +302,47 @@ class SelectScreenState extends State<SelectState> {
       width: 300,
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(vertical: 20),
             primary: Color(0xFFfb8c00),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
             textStyle:
-                const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
           ),
           onPressed: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => MapsPage()),
+            // );
             //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
           },
           child: Text('Community')),
+    );
+  }
+
+  Widget buildSoloBtn() {
+    return Container(
+      //padding: EdgeInsets.symmetric(vertical: 20),
+      width: 300,
+      child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 20),
+            primary: Color(0xFFfb8c00),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            textStyle:
+                const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+          ),
+          onPressed: () {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => MapsPage()),
+            // );
+            //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
+          },
+          child: Text('Solo')),
     );
   }
 
@@ -219,7 +355,6 @@ class SelectScreenState extends State<SelectState> {
           Icons.account_circle_outlined,
           color: Colors.white,
         ),
-        actions: [],
       ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
@@ -250,7 +385,7 @@ class SelectScreenState extends State<SelectState> {
                       Container(
                         child: Image.asset(
                           'assets/4.png',
-                          width: 300,
+                          width: 200,
                         ),
                       ),
                       Text(

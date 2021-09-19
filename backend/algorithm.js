@@ -3,10 +3,17 @@ const smoothing = 0.3;
 const deadzone = 0.15;
 const pull = 1;
 
-var step = 0;
+function getPath(origin, desiredTravelDistance) {
+  let numberOfNodesForPath = 5;
+  let wypnts = waypoints(numberOfNodesForPath);
+  let diameter = desiredTravelDistance * 1000 / 2; // travel distance is in km
+  let interval = diameter / 10 / 100000;
+  let geo_wypnts = convertGeo(waypoints(numberOfNodesForPath), origin, interval);
+  return geo_wypnts;
+}
 
-function waypoints(distance){
-    step++;
+// distance is the number of nodes.
+function waypoints(distance) {
     var dX;
     var dY;
 
@@ -27,7 +34,7 @@ function waypoints(distance){
 
         let cx = 0;
         let cy = 0;
-        
+
         //smooth weighting
         let sx = (position.x - pX); //-1 to 1 weighting of direction
         let sy = (position.y - pX);
@@ -46,8 +53,8 @@ function waypoints(distance){
 
 
         //random number from -1 to 1
-        let rx = Math.random() * 2 - 1; 
-        let ry = Math.random() * 2 - 1; 
+        let rx = Math.random() * 2 - 1;
+        let ry = Math.random() * 2 - 1;
 
         pX = position.x;
         pY = position.y;
@@ -74,7 +81,6 @@ function waypoints(distance){
         if(distanceleft < 1){
             returnIntent = true;
             distanceleft = 1;
-            console.log("return intent at step" + step);
         }
         
         console.log("d:",xChanged,yChanged,distanceleft);
@@ -96,9 +102,13 @@ function convertGeo(waypoints, origin, interval){
     }
     return geowaypoints;
 }
-console.log(convertGeo(waypoints(5), {lat: 100, lng: 1}, 0.001));
+
+//console.log(waypoints(5));
+// console.log(convertGeo(waypoints(5), {lat: 100, lng: 1}, 0.001));
+
+
 /*
-random dx, dy 
+random dx, dy
 
 smooth weighting
 s = smoothing constant (between 0 and 1)

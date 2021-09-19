@@ -83,21 +83,28 @@ module.exports = {
   },
   GetDesiredActivityForUser: async function(uid) {
     try {
-      console.log("we here");
-      console.log(firestore);
-      console.log(firestore.doc);
       let docRef = firestore.doc(uid + "/desiredActivity");
-      console.log(docRef);
       let docSnap = await docRef.get();
-      console.log(docSnap);
-      console.log(docSnap.data());
       if (docSnap != undefined) {
-        console.log("and we done");
         return docSnap.data();
       } else {
         throw "No document!";
       }
     } catch (err) {
+      throw err;
+    }
+  },
+  UpdateDesiredActivityForUser: async function(uid, desiredActivity) {
+    try {
+      let docRef = firestore.doc(uid + "/desiredActivity");
+      await docRef.update({
+        activityType: desiredActivity.activityType,
+        pace: desiredActivity.pace,
+        distance: desiredActivity.distance,
+        time: desiredActivity.time
+      });
+      return "Updated desiredActivity doc for " + uid;
+    } catch(err) {
       throw err;
     }
   }

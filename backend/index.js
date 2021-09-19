@@ -1,10 +1,16 @@
 const express = require('express')
 var hbs = require('hbs') // Templating engine.
 
+// Trying to fix a bug.
+var cors = require('cors');
+const gmaps = require("./gmaps.js");
+const algorithm = require("./algorithm.js");
+
 // Initialize the express js server.
 const app = express()
 app.set('view engine', 'hbs')
 app.set('views', './public')
+app.use(cors);
 
 const port = 3000
 
@@ -61,11 +67,29 @@ app.get("/signup", (req, res) => {
 // use html templating to return a html page for viewing in the iframe?
 // this way we can get a custom html each time based on the user.
 
+app.get('/api/update/activity', (req, res) => {
+  let uid = req.query['uid'];
+  let activityType = req.query['type'];
+  let pace = req.query['pace'];
+  let distance = req.query['distance'];
+  let time = req.query['time'];
+  firebase.UpdateDesiredActivityForUser(uid, {
+    activityType: parseInt(activityType),
+    pace: parseFloat(pace),
+    distance: parseFloat(distance),
+    time: parseFloat(time)
+  }).then((result) => {
+    res.json({result});
+  }).catch((err) => {
+    res.json({err});
+  });
+})
+
 // for now we are going to use the uid, for the purposes of testing.
 // TODO: Use the custom generated token that users store for auth.
 app.get('/api/path', (req, res) => {
 
-  console.log('API');
+  //console.log('API');
 
   // For the data that will be stored in Firebase.
   // The formatting will be like so.
@@ -78,7 +102,7 @@ app.get('/api/path', (req, res) => {
   // since we either use distance or time in our calculations,
   // we need to know which one is the canoncial one.
   let lat = req.query['lat'];
-  let lon = req.query['lon'];
+  let lng = req.query['lon'];
   let uid = req.query['uid'];
 
   firebase.GetDesiredActivityForUser(uid).then((desiredActivity) => {
@@ -87,25 +111,33 @@ app.get('/api/path', (req, res) => {
     // TODO: From the desired activity it is necessary to build the
     // correct path.
 
-    let proper_path = [
+    console.log({lat, lng});
+    console.log(desiredActivity.distance);
+    let proper_path = algorithm.getPath({lat, lng}, desiredActivity.distance);
+    console.log('proper_path',proper_path);
+    /*let proper_path = [
       {
-        lat: 44.226407,
-        lon: -76.513258
+        lat: 44.229571,
+        lng: -76.501460
       },
       {
-        lat: 44.226891,
-        lon: -76.520635
+        lat: 44.222516,
+        lng: -76.500951
       },
       {
-        lat: 44.240891,
-        lon: -76.510708
+        lat: 44.227531,
+        lng: -76.484051
+      },
+      {
+        lat: 44.228585,
+        lng: -76.487828
       }
-    ];
+    ];*/
 
     let l = proper_path.length;
     let last_waypoint = proper_path[l - 1];
     let waypoint_js = proper_path.slice(0, l - 1).map((waypoint) => {
-      return "{location: new google.maps.LatLng(" + waypoint.lat + "," + waypoint.lon + "), stopover: true }";
+      return "{location: new google.maps.LatLng(" + waypoint.lat + "," + waypoint.lng + "), stopover: true }";
     }).join(",");
 
     res.render('index', {
@@ -120,6 +152,35 @@ app.get('/api/path', (req, res) => {
     res.send(JSON.stringify(error));
   });
 
+});
+
+app.get("/api/debug", (req, res) => {
+  let lat = req.query['lat'];
+  let lng = req.query['lon'];
+
+  // get the proper_path via the algo in gmaps.js
+  let graph = gmaps.genGraph({lat, lng}, 5000/2);
+  console.log(graph);
+  let N = graph[0].length;
+
+  let proper_path = graph;
+
+  /*
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      proper_path.push(graph[i][j]);
+    }
+  }*/
+
+  let l = proper_path.length;
+  let waypoint_js = proper_path.map((waypoint) => {
+    return "markers.push(new google.maps.Marker({position: { lat:" + waypoint.lat + ",lng:" + waypoint.lng + "},map}));";
+  }).join("");
+  res.render('debug', {
+    lat,
+    lng,
+    waypoint_js
+  });
 });
 
 

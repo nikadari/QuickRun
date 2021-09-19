@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
 
-void main() => runApp(WelcomeScreen());
+//void main() => runApp(WelcomeScreen());
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: MyWelcomePage(),
     );
   }
@@ -52,7 +53,7 @@ Widget buildLogInBtn(BuildContext context) {
     width: 300,
     child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(10.0),
+          padding: EdgeInsets.symmetric(vertical: 25),
           primary: Color(0xFFfb8c00),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -88,7 +89,6 @@ class WelcomeState extends State<MyWelcomePage> {
       child: Image.asset(
         "assets/3.png",
         width: 1024,
-        height: 600,
       ),
     );
 
@@ -112,6 +112,7 @@ class WelcomeState extends State<MyWelcomePage> {
                 ),
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   logo,
                   buildLogInBtn(context),
