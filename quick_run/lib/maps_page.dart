@@ -3,6 +3,7 @@ import 'dart:html';
 import 'dart:ui' as ui;
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'select.dart';
 
 Future<Position> _determinePosition() async {
   bool serviceEnabled;
@@ -72,15 +73,30 @@ class _AppGameState extends State<AppGame> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black38
+        backgroundColor: Colors.grey[600],
+        leading: IconButton(
+          icon: Icon(
+            Icons.keyboard_backspace_rounded,
+            color: Colors.white
+          ),
+          iconSize: 32,
+          padding: EdgeInsets.all(10),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SelectScreen()),
+            );
+          }
+        )
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.black38,
+        color: Colors.grey[600],
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 25),
           child: IconButton(
             icon: Icon(
               Icons.play_circle_fill_rounded,
+              color: Colors.white
             ),
             iconSize: 64,
             onPressed: () {

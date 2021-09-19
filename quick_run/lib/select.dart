@@ -270,7 +270,7 @@ class SelectScreenState extends State<SelectState> {
       width: 300,
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(vertical: 25),
             primary: Color(0xFFfb8c00),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
@@ -295,7 +295,7 @@ class SelectScreenState extends State<SelectState> {
       width: 300,
       child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.all(10.0),
+            padding: EdgeInsets.symmetric(vertical: 25),
             primary: Color(0xFFfb8c00),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
