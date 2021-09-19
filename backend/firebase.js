@@ -1,4 +1,21 @@
-const {Firestore} = require('@google-cloud/firestore');
+/*const { initializeApp } = require('firebase/app');
+const { getAuth, signInWithEmailAndPassword } = require("firebase/auth");
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB5beQ3JbO1WQTW2pl88Xb_kVoJJuiEdT8",
+  authDomain: "quickrun-d93aa.firebaseapp.com",
+  projectId: "quickrun-d93aa",
+  storageBucket: "quickrun-d93aa.appspot.com",
+  messagingSenderId: "219586515002",
+  appId: "1:219586515002:web:8ef7fccce6ecfbfaf9a503"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth();
+console.log(app);
+*/
+
+/*const {Firestore} = require('@google-cloud/firestore');
 
 const firestore = new Firestore({
   projectId: "quickrun-d93aa",
@@ -12,6 +29,7 @@ collectionRef.add({foo: 'bar'}).then(docRef => {
   let firestore_loc = docRef.firestore;
   console.log(`Root location for document is ${firestore_loc.formattedName}`);
 });
+*/
 
 // TODO: Read in the credentials at runtime? Maybe.
 var admin = require("firebase-admin");
@@ -24,16 +42,19 @@ admin.initializeApp({
 module.exports = {
   Login: async function(email, password) {
     return new Promise((resolve, revoke) => {
+      /*console.log('auth', auth);
+      signInWithEmailAndPassword(auth, email, password).then((userCred) => {
+        reesolve({userCred});
+      }).catch((err) => {
+        revoke({err});
+      });*/
+
       admin.auth().getUserByEmail(email).then((userRecord) => {
         userRecordObj = userRecord.toJSON();
-        // Want to generate a token.
-        // Supposing that the email and password are correct.
+        // Want to generate a token and do secure things.
+        // But simply supposing that the email and password are correct.
         let uid = userRecordObj.uid;
-        admin.auth().createCustomToken(uid).then((customToken) => {
-          resolve({customToken});
-        }).catch((error) => {
-          revoke({error});
-        });
+        resolve({uid});
       }).catch((error) => {
         revoke({error});
       });

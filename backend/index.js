@@ -61,7 +61,7 @@ app.get('/api/path', (req, res) => {
   res.render('index');
 });
 
-app.get("/api/signup", (req, res) => {
+app.get("/signup", (req, res) => {
   let email = req.query['email'];
   let password = req.query['password'];
   let confirm = req.query['confirm'];
