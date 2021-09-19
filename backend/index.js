@@ -4,6 +4,7 @@ var hbs = require('hbs') // Templating engine.
 // Trying to fix a bug.
 var cors = require('cors');
 const gmaps = require("./gmaps.js");
+const algorithm = require("./algorithm.js");
 
 // Initialize the express js server.
 const app = express()
@@ -100,7 +101,7 @@ app.get('/api/path', (req, res) => {
   // since we either use distance or time in our calculations,
   // we need to know which one is the canoncial one.
   let lat = req.query['lat'];
-  let lon = req.query['lon'];
+  let lng = req.query['lon'];
   let uid = req.query['uid'];
 
   firebase.GetDesiredActivityForUser(uid).then((desiredActivity) => {
@@ -109,20 +110,25 @@ app.get('/api/path', (req, res) => {
     // TODO: From the desired activity it is necessary to build the
     // correct path.
 
-    let proper_path = [
+    let proper_path = algorithm.getpath({lat, lng}, desiredActivity.distance/2);
+    /*let proper_path = [
       {
-        lat: 44.226407,
-        lon: -76.513258
+        lat: 44.229571,
+        lon: -76.501460
       },
       {
-        lat: 44.226891,
-        lon: -76.520635
+        lat: 44.222516,
+        lon: -76.500951
       },
       {
-        lat: 44.240891,
-        lon: -76.510708
+        lat: 44.227531,
+        lon: -76.484051
+      },
+      {
+        lat: 44.228585,
+        lon: -76.487828
       }
-    ];
+    ];*/
 
     let l = proper_path.length;
     let last_waypoint = proper_path[l - 1];

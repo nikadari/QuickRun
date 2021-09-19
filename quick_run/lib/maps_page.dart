@@ -48,6 +48,7 @@ class MapsPage extends StatelessWidget {
 
     // This gets run everytime the app requires rendering.
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'QuickRun',
       home: AppGame(),
     );
@@ -116,8 +117,8 @@ class _AppGameState extends State<AppGame> {
                 ui.platformViewRegistry.registerViewFactory(
                   'hello-world-html',
                   (int viewId) => IFrameElement()
-                  //..src = 'http://localhost:3000/api/path?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString()
-                  ..src = 'http://localhost:3000/api/debug?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString()
+                  ..src = 'http://localhost:3000/api/path?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString()
+                  //..src = 'http://localhost:3000/api/debug?uid=iwoYcZfWWWMiw8B2vpq7xhUgzMQ2&lat=' + lat.toString() + "&lon=" + lon.toString()
                   ..style.border = 'none'
                 );
                 return HtmlElementView(viewType: 'hello-world-html');
