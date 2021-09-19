@@ -2,7 +2,8 @@ const express = require('express')
 var hbs = require('hbs') // Templating engine.
 
 // Trying to fix a bug.
-var cors = require('cors')
+var cors = require('cors');
+const gmaps = require("./gmaps.js");
 
 // Initialize the express js server.
 const app = express()
@@ -148,24 +149,22 @@ app.get("/api/debug", (req, res) => {
   let lng = req.query['lon'];
 
   // get the proper_path via the algo in gmaps.js
+  let graph = gmaps.genGraph({lat, lng}, 5000/2);
+  console.log(graph);
+  let N = graph[0].length;
 
-  let proper_path = [
-    {
-      lat: 44.226407,
-      lon: -76.513258
-    },
-    {
-      lat: 44.226891,
-      lon: -76.520635
-    },
-    {
-      lat: 44.240891,
-      lon: -76.510708
+  let proper_path = graph;
+
+  /*
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      proper_path.push(graph[i][j]);
     }
-  ];
+  }*/
+
   let l = proper_path.length;
   let waypoint_js = proper_path.map((waypoint) => {
-    return "markers.push(new google.maps.Marker({position: { lat:" + waypoint.lat + ",lng:" + waypoint.lon + "},map}));";
+    return "markers.push(new google.maps.Marker({position: { lat:" + waypoint.lat + ",lng:" + waypoint.lng + "},map}));";
   }).join("");
   res.render('debug', {
     lat,
