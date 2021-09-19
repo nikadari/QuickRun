@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'select.dart';
 
-//delete later
-void main() => runApp(MyLoginScreen());
+//void main() => runApp(MyLoginScreen());
 
 class MyLoginScreen extends StatelessWidget {
   @override

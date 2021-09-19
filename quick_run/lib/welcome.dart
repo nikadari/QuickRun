@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
 
-void main() => runApp(WelcomeScreen());
+//void main() => runApp(WelcomeScreen());
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
@@ -112,6 +112,7 @@ class WelcomeState extends State<MyWelcomePage> {
                 ),
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   logo,
                   buildLogInBtn(context),
