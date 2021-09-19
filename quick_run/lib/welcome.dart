@@ -46,7 +46,7 @@ Widget buildSignUpBtn() {
   );
 }
 
-Widget buildLogInBtn() {
+Widget buildLogInBtn(BuildContext context) {
   return Container(
     padding: EdgeInsets.symmetric(vertical: 25),
     width: 300,
@@ -60,7 +60,10 @@ Widget buildLogInBtn() {
           textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         onPressed: () {
-          //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyLoginScreen()),
+          );
         },
         child: Text('Login')),
   );
@@ -89,18 +92,6 @@ class WelcomeState extends State<MyWelcomePage> {
       ),
     );
 
-    ElevatedButton login_btn = ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.all(10.0),
-          primary: Color(0xFFfb8c00),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
-        onPressed: () {},
-        child: Text('Login'));
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -123,7 +114,7 @@ class WelcomeState extends State<MyWelcomePage> {
               child: Column(
                 children: <Widget>[
                   logo,
-                  buildLogInBtn(),
+                  buildLogInBtn(context),
                   buildSignUpBtn(),
                 ],
               ),

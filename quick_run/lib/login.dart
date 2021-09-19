@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'select.dart';
 
 //delete later
 void main() => runApp(MyLoginScreen());
@@ -131,7 +132,7 @@ Widget buildForgotPassBtn() {
       ));
 }
 
-Widget buildLoginBtn() {
+Widget buildLoginBtn(BuildContext context) {
   return Container(
     padding: EdgeInsets.symmetric(vertical: 25),
     width: 300,
@@ -145,7 +146,10 @@ Widget buildLoginBtn() {
           textStyle: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
         onPressed: () {
-          //Navigator.push(context, MaterialPageRoute(builder: (context) => MyLoginPage()), );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SelectScreen()),
+          );
         },
         child: Text('Login')),
   );
@@ -194,7 +198,7 @@ class LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 50),
                       buildPassword(),
                       buildForgotPassBtn(),
-                      buildLoginBtn(),
+                      buildLoginBtn(context),
                     ],
                   ),
                 ),
