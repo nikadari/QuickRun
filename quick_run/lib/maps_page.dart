@@ -12,9 +12,7 @@ void main() {
   ui.platformViewRegistry.registerViewFactory(
     'hello-world-html',
     (int viewId) => IFrameElement()
-    ..width = '640'
-    ..height = '360'
-    ..src = 'http://localhost:3000'
+    ..src = 'http://localhost:3000/api/path'
     ..style.border = 'none');
   runApp(MyApp());
 }
@@ -118,11 +116,7 @@ class _AppGameState extends State<AppGame> {
         )
       ),
       */
-      body: SizedBox(
-        width: 640,
-        height: 360,
-        child: HtmlElementView(viewType: 'hello-world-html'),
-      )
+      body: HtmlElementView(viewType: 'hello-world-html')
     );
   }
 
