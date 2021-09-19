@@ -65,10 +65,11 @@ class SelectScreenState extends State<SelectState> {
 
   var dController = new TextEditingController();
   var tController = new TextEditingController();
+  var pController = new TextEditingController();
 
   late int activity;
   late bool isD;
-  Color icon1Color = Colors.white;
+  Color icon1Color = Colors.orangeAccent;
   Color icon2Color = Colors.white;
   Color icon3Color = Colors.white;
 
@@ -77,11 +78,23 @@ class SelectScreenState extends State<SelectState> {
     super.initState();
     inputD = 0.0;
     inputT = 0.0;
-    inputP = 0.0;
+    inputP = 5.0;
     activity = 1;
+    dController.text = "0";
+    tController.text = "0";
+    pController.text = "5";
   }
 
   Widget buildActivityOptions() {
+
+    void UpdatePace(double newPace) {
+      inputP = newPace;
+      pController.text = inputP.toString();
+      // Update the time
+      inputT = inputD * inputP;
+      tController.text = inputT.toString();
+    }
+
     return Container(
       padding: EdgeInsets.all(15.0),
       child: Wrap(
@@ -98,6 +111,7 @@ class SelectScreenState extends State<SelectState> {
                   onPressed: () {
                     setState(() {
                       activity = 1;
+                      UpdatePace(5.0);
                       print(activity);
                       icon1Color = Colors.orangeAccent;
                       icon2Color = Colors.white;
@@ -126,6 +140,7 @@ class SelectScreenState extends State<SelectState> {
                   onPressed: () {
                     setState(() {
                       activity = 2;
+                      UpdatePace(13);
                       print(activity);
                       icon1Color = Colors.white;
                       icon2Color = Colors.orangeAccent;
@@ -154,6 +169,7 @@ class SelectScreenState extends State<SelectState> {
                   onPressed: () {
                     setState(() {
                       activity = 3;
+                      UpdatePace(2);
                       print(activity);
                       icon1Color = Colors.white;
                       icon2Color = Colors.white;
@@ -183,12 +199,15 @@ class SelectScreenState extends State<SelectState> {
             border: OutlineInputBorder(),
             fillColor: Colors.white,
             filled: true,
-            hintText: "Pace (min/km)", // TODO: Needs to be stateful and dependent on option
+            suffix: Text('min/km'),
+            hintText: "Pace", // TODO: Needs to be stateful and dependent on option
           ),
+          controller: pController,
           onChanged: (str) {
             try {
               inputP = double.parse(str);
-              // update the time
+              // TODO: The code below can be factored out.
+              // Update the time
               inputT = inputD * inputP;
               tController.text = inputT.toString();
               UpdateActivity("iwoYcZfWWWMiw8B2vpq7xhUgzMQ2", activity, inputP, inputD, inputT);
@@ -210,7 +229,8 @@ class SelectScreenState extends State<SelectState> {
                   border: OutlineInputBorder(),
                   fillColor: Colors.white,
                   filled: true,
-                  hintText: "Distance (km)",
+                  suffix: Text('km'),
+                  hintText: "Distance",
               ),
               onChanged: (str) {
                 try {
@@ -237,8 +257,8 @@ class SelectScreenState extends State<SelectState> {
                   border: OutlineInputBorder(),
                   fillColor: Colors.white,
                   filled: true,
-                  hintText: "Time (min)",
-
+                  suffix: Text('min'),
+                  hintText: "Time",
               ),
               onChanged: (str) {
                 try {
