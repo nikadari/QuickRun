@@ -3,8 +3,10 @@ const smoothing = 0.3;
 const deadzone = 0.15;
 const pull = 1;
 
+var step = 0;
 
 function waypoints(distance){
+    step++;
     var dX;
     var dY;
 
@@ -67,12 +69,15 @@ function waypoints(distance){
         else
             position.y++;
 
-        distanceleft -= Math.sqrt((xChanged)^2 + (yChanged) ^ 2); 
+        distanceleft = distanceleft - Math.sqrt(xChanged + yChanged); 
 
         if(distanceleft < 1){
             returnIntent = true;
-            distanceLeft = 1;
+            distanceleft = 1;
+            console.log("return intent at step" + step);
         }
+        
+        console.log("d:",xChanged,yChanged,distanceleft);
     } while(position.x != 0 || position.y != 0);
 
     waypoints.push(position);
@@ -91,7 +96,6 @@ function convertGeo(waypoints, origin, interval){
     }
     return geowaypoints;
 }
-console.log(waypoints(5));
 console.log(convertGeo(waypoints(5), {lat: 100, lng: 1}, 0.001));
 /*
 random dx, dy 
